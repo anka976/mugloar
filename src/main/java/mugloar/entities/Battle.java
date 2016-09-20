@@ -35,6 +35,11 @@ public class Battle {
         this.knight = knight;
     }
 
+    @Override
+    public String toString() {
+        return "Battle{" + "gameId=" + gameId + ", knight=" + knight + '}';
+    }
+
     public static class Knight {
         private String name;
         private Integer attack;
@@ -80,6 +85,12 @@ public class Battle {
 
         public void setEndurance(Integer endurance) {
             this.endurance = endurance;
+        }
+
+        @Override
+        public String toString() {
+            return "Knight{" + "name='" + name + '\'' + ", attack=" + attack + ", armor=" + armor + ", agility=" + agility +
+                    ", endurance=" + endurance + '}';
         }
     }
 }
