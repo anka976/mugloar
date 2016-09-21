@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <property name="LOG_FILE" value="battle.log"/>
+    <property name="FILE_LOG_PATTERN" value="%logger : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="mugloar.Application" level="INFO"/>
+    <logger name="STATS" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+</configuration>

@@ -1,5 +1,7 @@
 package mugloar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Created by anna.kulikova on 20/09/16.
  * {
@@ -11,4 +13,22 @@ package mugloar.entities;
  }
  }
  */
-public class Fight {}
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Fight {
+    private Dragon dragon;
+
+    public Dragon getDragon() {
+        return dragon;
+    }
+
+    public void setDragon(Dragon dragon) {
+        this.dragon = dragon;
+    }
+
+    @Override
+    public String toString() {
+        return "Fight{" +
+                "dragon=" + dragon +
+                '}';
+    }
+}
