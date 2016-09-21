@@ -3,7 +3,7 @@ package mugloar.entities;
 /**
  * Created by anna.kulikova on 20/09/16.
  */
-public class Report {
+public class WeatherReport {
     private String message;
     private String code;
 

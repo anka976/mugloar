@@ -1,14 +1,12 @@
 package mugloar;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -26,14 +24,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import mugloar.entities.Battle;
 import mugloar.entities.Dragon;
 import mugloar.entities.Fight;
-import mugloar.entities.Report;
 import mugloar.entities.Response;
+import mugloar.entities.WeatherReport;
 
 
 @SpringBootApplication
@@ -43,14 +40,15 @@ public class Application {
     private static final Logger logFile = LoggerFactory.getLogger("STATS");
 
     private static final String DRAGONSOFMUGLOAR_COM_API_GAME = "http://www.dragonsofmugloar.com/api/game";
-    private static final String DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT = "http://www.dragonsofmugloar.com/weather/api/report/";
-    private static final String DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION = "http://www.dragonsofmugloar"
+    private static final String DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT = "http://www.dragonsofmugloar"
+            + ".com/weatherReport/api/report/";
+    private static final String DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION = "http://www.dragonsofmugloar" + ""
             + ".com/api/game/{gameId}/solution";
 
     private static final String STORM_REPORT = "SRO";
     private static final String UMBRELLA_REPORT = "HVA";
     private static final String BALANCE_REPORT = "T E";
-//    private static final String NORM_REPORT = "NMR";
+    //    private static final String NORM_REPORT = "NMR";
 
     private static final String KEY_CLAW = "CLAW";
     private static final String KEY_FIRE = "FIRE";
@@ -88,18 +86,18 @@ public class Application {
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-//        InetSocketAddress address = new InetSocketAddress("proxy", 80);
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
-//        factory.setProxy(proxy);
+        //        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        //        InetSocketAddress address = new InetSocketAddress("proxy", 80);
+        //        Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
+        //        factory.setProxy(proxy);
         return builder
-//                .requestFactory(factory)
+                //                .requestFactory(factory)
                 .build();
     }
 
     @Bean
     public Unmarshaller unmarshaller() throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(Report.class);
+        JAXBContext jc = JAXBContext.newInstance(WeatherReport.class);
         return jc.createUnmarshaller();
     }
 
@@ -139,21 +137,21 @@ public class Application {
     private String getForecast(RestTemplate restTemplate, Unmarshaller unmarshaller, Long gameId) {
         StreamSource source = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT + gameId, StreamSource.class);
         try {
-            JAXBElement<Report> weather = unmarshaller.unmarshal(source, Report.class);
-            log.info("Weather was: " + weather.getValue().toString());
-            logFile.info("Weather was: " + weather.getValue().getCode());
-            return weather.getValue().getCode();
+            JAXBElement<WeatherReport> weatherReport = unmarshaller.unmarshal(source, WeatherReport.class);
+            log.info("Weather was: " + weatherReport.getValue().toString());
+            logFile.info("Weather was: " + weatherReport.getValue().getCode());
+            return weatherReport.getValue().getCode();
         } catch (JAXBException e) {
             log.error(e.getMessage(), e);
         }
         return "";
     }
 
-    private boolean fight(RestTemplate restTemplate, Battle battle, String weather) {
+    private boolean fight(RestTemplate restTemplate, Battle battle, String weatherReport) {
         Fight fight = new Fight();
         Dragon dragon = new Dragon();
 
-        switch (weather) {
+        switch (weatherReport) {
         case UMBRELLA_REPORT: {
             dragon.setClawSharpness(10); //armor
             dragon.setFireBreath(0); //endurance
@@ -166,7 +164,6 @@ public class Application {
             dragon.setFireBreath(5); //endurance
             dragon.setScaleThickness(5); //attack
             dragon.setWingStrength(5); //agility
-            fight.setDragon(dragon);
             break;
         }
         case STORM_REPORT: {
@@ -174,13 +171,13 @@ public class Application {
             break;
         }
         default: {
-            Map<String, Integer> solution = new TreeMap<>();
+            Map<String, Integer> solution = new HashMap<>();
             solution.put(KEY_CLAW, battle.getKnight().getArmor());
             solution.put(KEY_FIRE, battle.getKnight().getEndurance());
             solution.put(KEY_SCALE, battle.getKnight().getAttack());
             solution.put(KEY_WING, battle.getKnight().getAgility());
 
-            Counter counter = new Counter();
+            CounterVisitor counter = new CounterVisitor();
 
             solution.entrySet()
                     .stream()
@@ -211,7 +208,7 @@ public class Application {
         return RESP_VICTORY.equals(response.getBody().getStatus());
     }
 
-    private class Counter {
+    private class CounterVisitor {
         private final int finalSum = 20;
         private final int superPower = 8;
         private final int epicWin = 2;
