@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 
 import mugloar.entities.Battle;
 import mugloar.entities.Dragon;
-import mugloar.entities.Fight;
+import mugloar.entities.DragonFight;
 import mugloar.entities.Response;
 import mugloar.entities.WeatherReport;
 
@@ -64,7 +64,7 @@ public class Application {
         if (args.length > 0) {
             try {
                 numberOfBattles = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
+            } catch (Exception ignored) {
             }
         }
         if (numberOfBattles <= 0) {
@@ -148,7 +148,7 @@ public class Application {
     }
 
     private boolean fight(RestTemplate restTemplate, Battle battle, String weatherReport) {
-        Fight fight = new Fight();
+        DragonFight fight = new DragonFight();
         Dragon dragon = new Dragon();
 
         switch (weatherReport) {
@@ -197,7 +197,7 @@ public class Application {
 
         log.info(fight.toString());
         logFile.info(fight.toString());
-        HttpEntity<Fight> entity = new HttpEntity<>(fight);
+        HttpEntity<DragonFight> entity = new HttpEntity<>(fight);
         ResponseEntity<Response> response = restTemplate.exchange(DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION,
                 HttpMethod.PUT,
                 entity,
