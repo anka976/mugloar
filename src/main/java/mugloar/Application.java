@@ -40,9 +40,8 @@ public class Application {
     private static final Logger logFile = LoggerFactory.getLogger("STATS");
 
     private static final String DRAGONSOFMUGLOAR_COM_API_GAME = "http://www.dragonsofmugloar.com/api/game";
-    private static final String DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT = "http://www.dragonsofmugloar"
-            + ".com/weatherReport/api/report/";
-    private static final String DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION = "http://www.dragonsofmugloar" + ""
+    private static final String DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT = "http://www.dragonsofmugloar.com/weather/api/report/";
+    private static final String DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION = "http://www.dragonsofmugloar"
             + ".com/api/game/{gameId}/solution";
 
     private static final String STORM_REPORT = "SRO";
@@ -120,7 +119,7 @@ public class Application {
                 Battle battle = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_API_GAME, Battle.class);
                 info = "Battle claimed with: " + battle.toString();
                 log.info(info);
-                logFile.info(info);
+                logFile.info(getBattleLogPrefix(battle) + info);
                 String forecast = getForecast(restTemplate, unmarshaller, battle.getGameId());
                 if (fight(restTemplate, battle, forecast)) {
                     victories++;
@@ -135,14 +134,14 @@ public class Application {
     }
 
     private String getForecast(RestTemplate restTemplate, Unmarshaller unmarshaller, Long gameId) {
-        StreamSource source = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT + gameId, StreamSource.class);
         try {
+            StreamSource source = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT + gameId, StreamSource.class);
             JAXBElement<WeatherReport> weatherReport = unmarshaller.unmarshal(source, WeatherReport.class);
             log.info("Weather was: " + weatherReport.getValue().toString());
-            logFile.info("Weather was: " + weatherReport.getValue().getCode());
+            logFile.info(getBattleLogPrefix(gameId) + "Weather was - " + weatherReport.getValue().getCode());
             return weatherReport.getValue().getCode();
-        } catch (JAXBException e) {
-            log.error(e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Weather error: " + e.getMessage());
         }
         return "";
     }
@@ -196,16 +195,25 @@ public class Application {
         fight.setDragon(dragon);
 
         log.info(fight.toString());
-        logFile.info(fight.toString());
+        logFile.info(getBattleLogPrefix(battle) + fight.toString());
         HttpEntity<DragonFight> entity = new HttpEntity<>(fight);
         ResponseEntity<Response> response = restTemplate.exchange(DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION,
                 HttpMethod.PUT,
                 entity,
                 Response.class,
                 battle.getGameId());
-        log.info(response.getBody().getStatus() + ": " + response.getBody().getMessage());
-        logFile.info(response.getBody().getStatus());
+        String info = response.getBody().getStatus() + " - " + response.getBody().getMessage();
+        log.info(info);
+        logFile.info(getBattleLogPrefix(battle) + info);
         return RESP_VICTORY.equals(response.getBody().getStatus());
+    }
+
+    private String getBattleLogPrefix(Battle battle) {
+        return getBattleLogPrefix(battle.getGameId());
+    }
+
+    private String getBattleLogPrefix(Long battleId) {
+        return battleId + ": ";
     }
 
     private class CounterVisitor {
