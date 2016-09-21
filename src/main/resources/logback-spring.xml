@@ -3,7 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <property name="LOG_FILE" value="battle.log"/>
-    <property name="FILE_LOG_PATTERN" value="%logger : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="FILE_LOG_PATTERN" value="%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
     <logger name="org.springframework" level="ERROR"/>

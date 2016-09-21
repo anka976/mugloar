@@ -130,7 +130,7 @@ public class Application {
                     loses++;
                 }
             }
-            info = "Final stats for " + numberOfBattles + " battles: " + victories + " won, " + loses + " lost.";
+            info = "============ Final stats for " + numberOfBattles + " battles: " + victories + " won, " + loses + " lost.";
             log.info(info);
             logFile.info(info);
         };
