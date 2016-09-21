@@ -88,11 +88,13 @@ public class Application {
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        InetSocketAddress address = new InetSocketAddress("proxy-europe.int.kn", 8080);
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
-        factory.setProxy(proxy);
-        return builder.requestFactory(factory).build();
+//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        InetSocketAddress address = new InetSocketAddress("proxy", 80);
+//        Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
+//        factory.setProxy(proxy);
+        return builder
+//                .requestFactory(factory)
+                .build();
     }
 
     @Bean
