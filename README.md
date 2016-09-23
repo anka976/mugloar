@@ -11,4 +11,4 @@ In the beginning the client will ask for desired number of battles:
     [INFO] --- spring-boot-maven-plugin:1.4.0.RELEASE:run (default-cli) @ mugloar ---
     Please, enter the number of desired battles (default 5):
 
-The average win-ratio for dragons is about 10%
+The average win-ratio for dragons is about 90%
