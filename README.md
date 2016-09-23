@@ -14,4 +14,5 @@ In the beginning the client will ask for desired number of battles:
 The average win-ratio for dragons is about 90%
 
 Verbose battle log will be printed to console, and less verbose log will be saved to rolling file in the project root:
+
     battle.log
