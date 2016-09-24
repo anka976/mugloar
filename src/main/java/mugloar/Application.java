@@ -1,6 +1,5 @@
 package mugloar;
 
-import java.io.Console;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;

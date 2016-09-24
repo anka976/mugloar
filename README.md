@@ -2,6 +2,8 @@
 
 This is a [Spring Boot](https://spring.io/) Rest Client application, and it uses RestTemplate to communicate with [Mugloar Battle API](http://www.dragonsofmugloar.com/api) . For solving battles client requests also the [Mugloar Weather API](http://www.dragonsofmugloar.com/weather).
 
+Project requires Java 8. Main logic is stored in `mugloar.Application` class.
+
 To start battles you need to clone the project and run it with Maven:
 
      mvn spring-boot:run
