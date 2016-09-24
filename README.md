@@ -7,12 +7,14 @@ To start battles you need to clone the project and run it with Maven:
      mvn spring-boot:run
 Spring Boot will download all the dependencies and load the JVM. 
 In the beginning the client will ask for desired number of battles:
+![Console view](https://raw.githubusercontent.com/anka976/mugloar/master/src/test/resources/battle-run.png "Console view")
 
-    [INFO] --- spring-boot-maven-plugin:1.4.0.RELEASE:run (default-cli) @ mugloar ---
-    Please, enter the number of desired battles (default 5):
+Wait for all the battles are finished. You'll see a message like this: 
 
+	============ Final stats for 2000 battles: 1828 won, 172 lost.
+	
 The average win-ratio for dragons is about 90%
 
-Verbose battle log will be printed to console, and less verbose log will be saved to a rolling file in the project root:
+Verbose log will be saved to a rolling file in the project root:
 
     battle.log
