@@ -1,5 +1,6 @@
 package mugloar;
 
+import java.io.Console;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,6 +39,9 @@ public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
     private static final Logger logFile = LoggerFactory.getLogger("STATS");
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String RESET = "\u001B[0m";
 
     private static final String DRAGONSOFMUGLOAR_COM_API_GAME = "http://www.dragonsofmugloar.com/api/game";
     private static final String DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT = "http://www.dragonsofmugloar.com/weather/api/report/";
@@ -58,7 +62,7 @@ public class Application {
 
     public static void main(String args[]) {
         int numberOfBattles = 0;
-        String[] newArgs = {"5"};
+        String[] newArgs = {"10"};
 
         if (args.length > 0) {
             try {
@@ -67,7 +71,7 @@ public class Application {
             }
         }
         if (numberOfBattles <= 0) {
-            System.out.println("Please, enter the number of desired battles (default 5):");
+            System.out.println(GREEN + "Please, enter the number of desired battles (default 10):" + RESET);
             try {
                 Scanner scanIn = new Scanner(System.in);
                 String inputString = scanIn.nextLine();
@@ -103,7 +107,7 @@ public class Application {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate, Unmarshaller unmarshaller) throws Exception {
         return args -> {
-            log.info(Arrays.toString(args));
+            log.info("Upcoming battles number: " + Arrays.toString(args));
             int numberOfBattles = Integer.parseInt(args[0]);
             int victories = 0;
             int loses = 0;
@@ -112,14 +116,11 @@ public class Application {
             logFile.info("----------------------------- BATTLE TIME! --------------------------------------");
 
             for (int i = 0; i < numberOfBattles; i++) {
-                info = "Starting the battle " + (i + 1) + " of " + numberOfBattles;
-                log.info(info);
-                logFile.info(info);
+                System.out.printf(RED + "\rBattle: %3d of " + numberOfBattles, i+1);
+                logFile.info("Starting the battle " + (i + 1) + " of " + numberOfBattles);
 
                 Battle battle = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_API_GAME, Battle.class);
-                info = "Battle claimed with: " + battle.toString();
-                log.info(info);
-                logFile.info(getBattleLogPrefix(battle) + info);
+                logFile.info(getBattleLogPrefix(battle) + "Battle claimed with: " + battle.toString());
                 String forecast = getForecast(restTemplate, unmarshaller, battle.getGameId());
                 if (fight(restTemplate, battle, forecast)) {
                     victories++;
@@ -127,8 +128,9 @@ public class Application {
                     loses++;
                 }
             }
+            System.out.println(RESET);
             info = "============ Final stats for " + numberOfBattles + " battles: " + victories + " won, " + loses + " lost.";
-            log.info(info);
+            log.info(RED + info + RESET);
             logFile.info(info);
         };
     }
@@ -137,7 +139,6 @@ public class Application {
         try {
             StreamSource source = restTemplate.getForObject(DRAGONSOFMUGLOAR_COM_WEATHER_API_REPORT + gameId, StreamSource.class);
             JAXBElement<WeatherReport> weatherReport = unmarshaller.unmarshal(source, WeatherReport.class);
-            log.info("Weather was: " + weatherReport.getValue().toString());
             logFile.info(getBattleLogPrefix(gameId) + "Weather was - " + weatherReport.getValue().getCode());
             return weatherReport.getValue().getCode();
         } catch (Exception e) {
@@ -193,18 +194,17 @@ public class Application {
         }
 
         fight.setDragon(dragon);
-
-        log.info(fight.toString());
         logFile.info(getBattleLogPrefix(battle) + fight.toString());
+
         HttpEntity<DragonFight> entity = new HttpEntity<>(fight);
         ResponseEntity<Response> response = restTemplate.exchange(DRAGONSOFMUGLOAR_COM_API_GAME_SOLUTION,
                 HttpMethod.PUT,
                 entity,
                 Response.class,
                 battle.getGameId());
-        String info = response.getBody().getStatus() + " - " + response.getBody().getMessage();
-        log.info(info);
-        logFile.info(getBattleLogPrefix(battle) + info);
+
+        logFile.info(getBattleLogPrefix(battle) + response.getBody().getStatus() + " - " + response.getBody().getMessage());
+
         return RESP_VICTORY.equals(response.getBody().getStatus());
     }
 
